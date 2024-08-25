@@ -6,19 +6,27 @@ const BOARD_SIZE = 16;
 const initialBoard = () => {
   const board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(null));
   
-  const setupRow = (row, color) => {
-    board[row] = [
-      { type: 'R', color }, { type: 'N', color }, { type: 'B', color }, { type: 'Q', color },
-      { type: 'K', color }, { type: 'B', color }, { type: 'N', color }, { type: 'R', color },
-      { type: 'P', color }, { type: 'P', color }, { type: 'P', color }, { type: 'P', color },
-      { type: 'P', color }, { type: 'P', color }, { type: 'P', color }, { type: 'P', color },
-    ];
+  const setupRow = (row, color, isPawnRow = false) => {
+    if (isPawnRow) {
+      for (let i = 0; i < BOARD_SIZE; i++) {
+        board[row][i] = { type: 'P', color };
+      }
+    } else {
+      const pieces = ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'];
+      for (let i = 0; i < 8; i++) {
+        board[row][i] = { type: pieces[i], color };
+        board[row][BOARD_SIZE - 1 - i] = { type: pieces[i], color };
+      }
+    }
   };
 
+  // Set up white pieces
   setupRow(0, 'white');
-  setupRow(1, 'white');
-  setupRow(14, 'black');
-  setupRow(15, 'black');
+  setupRow(1, 'white', true);
+
+  // Set up black pieces
+  setupRow(BOARD_SIZE - 1, 'black');
+  setupRow(BOARD_SIZE - 2, 'black', true);
 
   return board;
 };
