@@ -7,26 +7,26 @@ const initialBoard = () => {
   const board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(null));
   
   const setupRow = (row, color, isPawnRow = false) => {
+    const offset = (BOARD_SIZE - 8) / 2; // Center the pieces
     if (isPawnRow) {
-      for (let i = 0; i < BOARD_SIZE; i++) {
-        board[row][i] = { type: 'P', color };
+      for (let i = 0; i < 8; i++) {
+        board[row][i + offset] = { type: 'P', color };
       }
     } else {
       const pieces = ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'];
       for (let i = 0; i < 8; i++) {
-        board[row][i] = { type: pieces[i], color };
-        board[row][BOARD_SIZE - 1 - i] = { type: pieces[i], color };
+        board[row][i + offset] = { type: pieces[i], color };
       }
     }
   };
 
-  // Set up white pieces
-  setupRow(0, 'white');
-  setupRow(1, 'white', true);
+  // Set up black pieces at the top
+  setupRow(0, 'black');
+  setupRow(1, 'black', true);
 
-  // Set up black pieces
-  setupRow(BOARD_SIZE - 1, 'black');
-  setupRow(BOARD_SIZE - 2, 'black', true);
+  // Set up white pieces at the bottom
+  setupRow(BOARD_SIZE - 2, 'white', true);
+  setupRow(BOARD_SIZE - 1, 'white');
 
   return board;
 };
@@ -66,6 +66,7 @@ const Game = () => {
   const [board, setBoard] = useState(initialBoard());
   const [selectedPiece, setSelectedPiece] = useState(null);
   const [currentPlayer, setCurrentPlayer] = useState('white');
+  const [moveCount, setMoveCount] = useState(0);
 
   const isPathClear = (start, end) => {
     const dx = Math.sign(end.j - start.j);
@@ -96,12 +97,12 @@ const Game = () => {
 
     switch (piece.type) {
       case 'P':
-        const direction = piece.color === 'white' ? 1 : -1;
+        const direction = piece.color === 'white' ? -1 : 1;
         if (start.j === end.j && !target) {
           if (dy === 1 && start.i + direction === end.i) {
             return true;
           }
-          if (dy === 2 && ((piece.color === 'white' && start.i === 1) || (piece.color === 'black' && start.i === 14)) && start.i + 2 * direction === end.i) {
+          if (dy === 2 && ((piece.color === 'white' && start.i === BOARD_SIZE - 2) || (piece.color === 'black' && start.i === 1)) && start.i + 2 * direction === end.i) {
             return true;
           }
         }
@@ -139,6 +140,7 @@ const Game = () => {
         setBoard(newBoard);
         setSelectedPiece(null);
         setCurrentPlayer(currentPlayer === 'white' ? 'black' : 'white');
+        setMoveCount(moveCount + 1);
       } else {
         setSelectedPiece(null);
       }
@@ -148,7 +150,7 @@ const Game = () => {
   };
 
   useEffect(() => {
-    if (currentPlayer === 'black') {
+    if (currentPlayer === 'black' && moveCount > 0) {
       setTimeout(() => {
         const pieces = [];
         for (let i = 0; i < BOARD_SIZE; i++) {
@@ -176,12 +178,12 @@ const Game = () => {
         }
       }, 1000);
     }
-  }, [currentPlayer]);
+  }, [currentPlayer, moveCount]);
 
   return (
     <div>
       <Board board={board} onClick={handleClick} selectedPiece={selectedPiece} />
-      <div>Current Player: {currentPlayer}</div>
+      <div className="game-info">Current Player: {currentPlayer}</div>
     </div>
   );
 };

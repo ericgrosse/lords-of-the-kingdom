@@ -1,5 +1,16 @@
+.App {
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  color: #333;
+}
+
 .board {
   display: inline-block;
+  border: 2px solid #333;
+  background-color: #f0d9b5;
 }
 
 .board-row {
@@ -9,19 +20,18 @@
 .square {
   width: 40px;
   height: 40px;
-  border: 1px solid #999;
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
 }
 
-.square:nth-child(even) {
-  background-color: #eee;
+.square:nth-child(odd) {
+  background-color: #b58863;
 }
 
 .square.selected {
-  background-color: #ffff99;
+  background-color: #f6f669;
 }
 
 .piece {
@@ -36,4 +46,10 @@
 
 .black {
   color: #000;
+}
+
+.game-info {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
 }
