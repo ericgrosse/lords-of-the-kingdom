@@ -8,13 +8,11 @@ h1 {
 }
 
 .board {
-  display: inline-block;
+  display: inline-grid;
+  grid-template-columns: repeat(16, 40px);
+  grid-template-rows: repeat(16, 40px);
   border: 2px solid #333;
   background-color: #f0d9b5;
-}
-
-.board-row {
-  display: flex;
 }
 
 .square {
@@ -24,10 +22,16 @@ h1 {
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  border: 1px solid #333;
+  box-sizing: border-box;
+}
+
+.square:nth-child(even) {
+  background-color: #b58863;
 }
 
 .square:nth-child(odd) {
-  background-color: #b58863;
+  background-color: #f0d9b5;
 }
 
 .square.selected {
