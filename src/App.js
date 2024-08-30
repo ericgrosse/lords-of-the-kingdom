@@ -7,24 +7,15 @@ const initialBoard = () => {
   const board = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(null));
   
   const setupRow = (row, color, isPawnRow = false) => {
-    const offset = (BOARD_SIZE - 8) / 2; // Center the pieces
-    if (isPawnRow) {
-      for (let i = 0; i < 8; i++) {
-        board[row][i + offset] = { type: 'P', color };
-      }
-    } else {
-      const pieces = ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'];
-      for (let i = 0; i < 8; i++) {
-        board[row][i + offset] = { type: pieces[i], color };
-      }
+    const pieces = isPawnRow ? Array(8).fill('P') : ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'];
+    const startCol = (BOARD_SIZE - pieces.length) / 2;
+    for (let i = 0; i < pieces.length; i++) {
+      board[row][startCol + i] = { type: pieces[i], color };
     }
   };
 
-  // Set up black pieces at the top
   setupRow(0, 'black');
   setupRow(1, 'black', true);
-
-  // Set up white pieces at the bottom
   setupRow(BOARD_SIZE - 2, 'white', true);
   setupRow(BOARD_SIZE - 1, 'white');
 
@@ -88,7 +79,7 @@ const Game = () => {
     const piece = board[start.i][start.j];
     const target = board[end.i][end.j];
 
-    if (target && target.color === piece.color) {
+    if (!piece || (target && target.color === piece.color)) {
       return false;
     }
 
@@ -102,7 +93,7 @@ const Game = () => {
           if (dy === 1 && start.i + direction === end.i) {
             return true;
           }
-          if (dy === 2 && ((piece.color === 'white' && start.i === BOARD_SIZE - 2) || (piece.color === 'black' && start.i === 1)) && start.i + 2 * direction === end.i) {
+          if (dy === 2 && ((piece.color === 'white' && start.i === BOARD_SIZE - 2) || (piece.color === 'black' && start.i === 1)) && start.i + 2 * direction === end.i && !board[start.i + direction][start.j]) {
             return true;
           }
         }
@@ -149,6 +140,18 @@ const Game = () => {
     }
   };
 
+  const getValidMoves = (piece) => {
+    const validMoves = [];
+    for (let i = 0; i < BOARD_SIZE; i++) {
+      for (let j = 0; j < BOARD_SIZE; j++) {
+        if (isValidMove(piece, { i, j })) {
+          validMoves.push({ i, j });
+        }
+      }
+    }
+    return validMoves;
+  };
+
   useEffect(() => {
     if (currentPlayer === 'black' && moveCount > 0) {
       setTimeout(() => {
@@ -160,19 +163,21 @@ const Game = () => {
             }
           }
         }
-        const piece = pieces[Math.floor(Math.random() * pieces.length)];
-        let validMove = false;
-        let attempts = 0;
-        while (!validMove && attempts < 100) {
-          const newI = Math.floor(Math.random() * BOARD_SIZE);
-          const newJ = Math.floor(Math.random() * BOARD_SIZE);
-          if (isValidMove(piece, { i: newI, j: newJ })) {
+
+        let validMove = null;
+        while (pieces.length > 0 && !validMove) {
+          const pieceIndex = Math.floor(Math.random() * pieces.length);
+          const piece = pieces[pieceIndex];
+          const moves = getValidMoves(piece);
+          if (moves.length > 0) {
+            validMove = moves[Math.floor(Math.random() * moves.length)];
             handleClick(piece.i, piece.j);
-            handleClick(newI, newJ);
-            validMove = true;
+            handleClick(validMove.i, validMove.j);
+          } else {
+            pieces.splice(pieceIndex, 1);
           }
-          attempts++;
         }
+
         if (!validMove) {
           setCurrentPlayer('white');
         }

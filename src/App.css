@@ -26,11 +26,13 @@ h1 {
   box-sizing: border-box;
 }
 
-.square:nth-child(even) {
+.board-row:nth-child(odd) .square:nth-child(even),
+.board-row:nth-child(even) .square:nth-child(odd) {
   background-color: #b58863;
 }
 
-.square:nth-child(odd) {
+.board-row:nth-child(odd) .square:nth-child(odd),
+.board-row:nth-child(even) .square:nth-child(even) {
   background-color: #f0d9b5;
 }
 
@@ -41,15 +43,23 @@ h1 {
 .piece {
   font-size: 24px;
   font-weight: bold;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  border: 2px solid #000;
 }
 
 .white {
-  color: #fff;
-  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  background-color: #fff;
+  color: #000;
 }
 
 .black {
-  color: #000;
+  background-color: #000;
+  color: #fff;
 }
 
 .game-info {
